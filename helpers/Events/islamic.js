@@ -1,9 +1,3 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/helpers/Events/islamic.js b/helpers/Events/islamic.js
-index 8b137891791fe96927ad78e64b0aad7bded08bdc..aa423cdc1e3ef568f5b94b31be9cf215b6b71c2b 100644
---- a/helpers/Events/islamic.js
-+++ b/helpers/Events/islamic.js
-@@ -1 +1,46 @@
 +/*!-======[ Default Export Function ]======-!*/
 +export default async function on({ cht, ev }) {
 +  if (!cfg.menu.tags.religion) cfg.menu.tags.religion = '*<☪️Religion>*';
