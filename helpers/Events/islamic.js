@@ -1,1 +1,55 @@
-
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/helpers/Events/islamic.js b/helpers/Events/islamic.js
+index 8b137891791fe96927ad78e64b0aad7bded08bdc..aa423cdc1e3ef568f5b94b31be9cf215b6b71c2b 100644
+--- a/helpers/Events/islamic.js
++++ b/helpers/Events/islamic.js
+@@ -1 +1,46 @@
++/*!-======[ Default Export Function ]======-!*/
++export default async function on({ cht, ev }) {
++  if (!cfg.menu.tags.religion) cfg.menu.tags.religion = '*<☪️Religion>*';
+ 
++  ev.on(
++    {
++      cmd: ['surah', 'surahrandom', 'randomsurah'],
++      listmenu: ['surah'],
++      tag: 'religion',
++      energy: 5,
++    },
++    async () => {
++      let response;
++
++      try {
++        response = await fetch(
++          'https://api.autoresbot.com/api/surah/random'
++        ).then((res) => res.json());
++      } catch {
++        return cht.reply('Gagal mengambil data surah dari API, coba lagi nanti.');
++      }
++
++      if (!response?.status || response?.code !== 200 || !Array.isArray(response?.data)) {
++        return cht.reply('Data surah dari API tidak valid.');
++      }
++
++      let surah = response.data?.[0];
++      if (!surah) return cht.reply('Surah tidak ditemukan dari API.');
++
++      let text =
++        `📖 *Surah Random*\n\n` +
++        `• ID: ${surah.id || '-'}\n` +
++        `• Nama: ${surah.name || '-'}\n` +
++        `• Arab: ${surah.arabic_translation || '-'}\n` +
++        `• English: ${surah.english_translation || '-'}\n` +
++        `• Indonesia: ${surah.indonesian_translation || '-'}\n` +
++        `• Nomor Surah: ${surah.surah_number || '-'}\n` +
++        `• Jumlah Ayat: ${surah.number_of_verses || '-'}\n` +
++        `• Turun di: ${surah.revealed_in || '-'}\n` +
++        `• Tipe: ${surah.type || '-'}\n` +
++        `• Audio: ${surah.audio_link || '-'}\n`;
++
++      return cht.reply(text);
++    }
++  );
++}
+ 
+EOF
+)
