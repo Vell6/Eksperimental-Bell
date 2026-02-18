@@ -297,7 +297,8 @@ export default async function detector({ Exp, store }) {
     );
     for (let [id, b] of chatDb) {
       try {
-        if (!(id in jadwal.groups)) await jadwal.init(id, b.jadwalsholat.v);
+        if (!(id in jadwal.groups))
+          await jadwal.init(id, b.jadwalsholat.v, b.jadwalsholat);
         let { status, data, db } = await jadwal.now(id);
 
         let { ramadhan, tutup } = b.jadwalsholat;
