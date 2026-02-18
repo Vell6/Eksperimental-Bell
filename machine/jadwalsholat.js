@@ -30,6 +30,11 @@ Data.audio = {
     .split('.')
     .map((a, i) => cdn + '/audio/' + a + (i + 1) + '.mp3')
     .slice(0, -1),
+  sahur: 'adzan_subuh.'
+    .repeat(4)
+    .split('.')
+    .map((a, i) => cdn + '/audio/' + a + (i + 1) + '.mp3')
+    .slice(0, -1),
 };
 
 export class JadwalSholat {
@@ -108,8 +113,13 @@ export class JadwalSholat {
               ? 'Asia/Makassar'
               : 'Asia/Jayapura';
           if (id == 'no') return { status: true, data: list, timeZone };
-          if (!(id in this.groups))
-            this.groups[id] = { v, jadwal: list, timeZone, ...opts };
+          this.groups[id] = {
+            ...(this.groups[id] || {}),
+            ...opts,
+            v,
+            jadwal: list,
+            timeZone,
+          };
           return { status: true, data: list, db: this.groups[id] };
         } catch (e) {
           console.error(`[${proxy}] Error proxyng jadwalsholat.js > init`, e);
@@ -177,13 +187,13 @@ export class JadwalSholat {
     this.groups[id].jadwal =
       this.groups[id].jadwal?.[0]?.tanggal?.split('/')?.[1] === m
         ? this.groups[id].jadwal
-        : (await this.init(id, v)).data;
+        : (await this.init(id, v, this.groups[id])).data;
     this.groups[id].today =
       d == this.groups[id]?.today?.hari
         ? this.groups[id].today
         : this.groups[id].jadwal.find((a) => a.tanggal == c.dm);
     if (!this.groups[id].today) {
-      await this.init(id, this.groups[id].v);
+      await this.init(id, this.groups[id].v, this.groups[id]);
       this.groups[id].today = this.groups[id].jadwal.find(
         (a) => a.tanggal == c.dm
       );
@@ -194,10 +204,12 @@ export class JadwalSholat {
       (a) => !except.some((b) => a.includes(b))
     );
 
-    let waktu = ktoday.find((a) => {
+    let isSahurTime = ramadhan && h == '03' && parseInt(min) <= 10;
+    let waktuSholat = ktoday.find((a) => {
       let [sh, sm] = this.groups[id]?.today?.[a]?.split(':').map(Number);
       return sh == h && parseInt(min) - sm <= 10 && parseInt(min) >= sm;
     });
+    let waktu = isSahurTime ? 'sahur' : waktuSholat;
 
     let hasNotice = Boolean(this.groups[id]?.today?.['notice-' + waktu]);
     if (waktu) this.groups[id].today['notice-' + waktu] = true;
@@ -207,7 +219,12 @@ export class JadwalSholat {
         today: this.groups[id].today,
         now: waktu || false,
         adzan:
-          waktu == 'subuh'
+          waktu == 'sahur'
+            ? (Data.audio?.sahur?.length > 0
+                ? Data.audio.sahur
+                : Data.audio.adzan_subuh
+              ).getRandom()
+            : waktu == 'subuh'
             ? Data.audio.adzan_subuh.getRandom()
             : waktu
               ? Data.audio.adzan.getRandom()
