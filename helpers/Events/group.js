@@ -561,7 +561,7 @@ _Anda juga bisa menyertakan type di sebelah input daerah untuk kebutuhan tertent
 
 \`List type:\`
 - ramadhan
-> Untuk bulan ramadhan, ini akan sekaligus mengingatkan waktu imsak dan ucapan selamat berbuka saat adzan Maghrib berkumandang
+> Untuk bulan ramadhan, ini akan sekaligus mengingatkan waktu imsak, sahur jam 03:00, dan ucapan selamat berbuka saat adzan Maghrib berkumandang
 - tutup
 > otomatis menutup grup(selama 5 menit) saat tiba waktu sholat
 

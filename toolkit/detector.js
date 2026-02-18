@@ -317,6 +317,7 @@ export default async function detector({ Exp, store }) {
               ashar: '⏳',
               maghrib: '🌇',
               isya: '🌙',
+              sahur: '🥣',
             }[data.now] || '';
           let text =
             data.now == 'magrib' && ramadhan
@@ -325,7 +326,9 @@ export default async function detector({ Exp, store }) {
                 ? `*Hai seluruh umat Muslim yang berada di grup \`${subject}\`!*\n\nWaktu sholat *${data.now}${emoji}* di wilayah ${b.jadwalsholat.v} telah masuk. Mari kita laksanakan sholat fardhu tepat waktu.\n\nBagi yang memiliki kesempatan, jangan lupa menunaikan sholat sunnah Tarawih.\n\nSemoga Allah SWT menerima amal ibadah kita semua. Aamiin.`
                 : data.now == 'imsak'
                   ? `*Hai seluruh umat Muslim yang berada di grup \`${subject}\`!*\n\nWaktu *imsak* di daerah ${b.jadwalsholat.v} telah tiba!\nSilakan menyelesaikan santap sahurnya, dan bersiap untuk menunaikan ibadah puasa.`
-                  : `*Hai seluruh umat muslim yang berada di group \`${subject}\`!*\n\nWaktu sholat *${data.now}${emoji}* di daerah ${b.jadwalsholat.v} sudah masuk!`;
+                  : data.now == 'sahur'
+                    ? `*Hai seluruh umat Muslim yang berada di grup \`${subject}\`!*\n\nWaktu *sahur${emoji}* telah tiba! Sekarang pukul 03:00 di daerah ${b.jadwalsholat.v}.\nSilakan santap sahur dan siapkan niat puasa terbaik untuk hari ini.`
+                    : `*Hai seluruh umat muslim yang berada di group \`${subject}\`!*\n\nWaktu sholat *${data.now}${emoji}* di daerah ${b.jadwalsholat.v} sudah masuk!`;
           await Exp.relayMessage(
             id,
             {
@@ -342,7 +345,9 @@ export default async function detector({ Exp, store }) {
 (Aku niat berpuasa esok hari untuk menunaikan kewajiban di bulan Ramadan tahun ini karena Allah Ta’ala).  
 
 Semoga puasa kita diterima Allah dan diberikan kekuatan serta kelancaran sepanjang hari. Aamiin.`
-                          : `Buat semua yang ada di daerah ${b.jadwalsholat.v}, yuk segera tunaikan sholat!${isBotAdmin && tutup ? `\n\n_Group akan ditutup selama ${w}_` : ''}`,
+                          : data.now == 'sahur'
+                            ? `Selamat makan sahur. Semoga Allah memberikan kesehatan, keberkahan, dan kekuatan untuk menjalani puasa hari ini. Aamiin.`
+                            : `Buat semua yang ada di daerah ${b.jadwalsholat.v}, yuk segera tunaikan sholat!${isBotAdmin && tutup ? `\n\n_Group akan ditutup selama ${w}_` : ''}`,
                     },
                     ...(['magrib'].includes(data.now)
                       ? {
@@ -359,7 +364,7 @@ Semoga puasa kita diterima Allah dan diberikan kekuatan serta kelancaran sepanja
             {}
           );
 
-          if (isBotAdmin && tutup && data.now !== 'imsak') {
+          if (isBotAdmin && tutup && !['imsak', 'sahur'].includes(data.now)) {
             await Exp.groupSettingUpdate(id, 'announcement');
             setTimeout(
               () => Exp.groupSettingUpdate(id, 'not_announcement'),

@@ -30,6 +30,11 @@ Data.audio = {
     .split('.')
     .map((a, i) => cdn + '/audio/' + a + (i + 1) + '.mp3')
     .slice(0, -1),
+  sahur: 'adzan_subuh.'
+    .repeat(4)
+    .split('.')
+    .map((a, i) => cdn + '/audio/' + a + (i + 1) + '.mp3')
+    .slice(0, -1),
 };
 
 export class JadwalSholat {
@@ -194,10 +199,13 @@ export class JadwalSholat {
       (a) => !except.some((b) => a.includes(b))
     );
 
-    let waktu = ktoday.find((a) => {
+    let waktu =
+      ramadhan && h == '03' && parseInt(min) <= 10
+        ? 'sahur'
+        : ktoday.find((a) => {
       let [sh, sm] = this.groups[id]?.today?.[a]?.split(':').map(Number);
       return sh == h && parseInt(min) - sm <= 10 && parseInt(min) >= sm;
-    });
+          });
 
     let hasNotice = Boolean(this.groups[id]?.today?.['notice-' + waktu]);
     if (waktu) this.groups[id].today['notice-' + waktu] = true;
@@ -207,7 +215,12 @@ export class JadwalSholat {
         today: this.groups[id].today,
         now: waktu || false,
         adzan:
-          waktu == 'subuh'
+          waktu == 'sahur'
+            ? (Data.audio?.sahur?.length > 0
+                ? Data.audio.sahur
+                : Data.audio.adzan_subuh
+              ).getRandom()
+            : waktu == 'subuh'
             ? Data.audio.adzan_subuh.getRandom()
             : waktu
               ? Data.audio.adzan.getRandom()
